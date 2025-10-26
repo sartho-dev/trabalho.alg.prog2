@@ -10,12 +10,12 @@ typedef struct {
     char alt_correta;
 } Pergunta;
 
-// Função que exibe uma pergunta e retorna se acertou ou não
+// exibe uma pergunta e retorna se acertou ou não
 int perguntar(Pergunta p, int *pulos, int *ajudas) {
     char resposta;
     char letras[] = {'a', 'b', 'c', 'd'};
 
-    printf("\nNivel %c\n", p.nivel);
+    printf("\nNivel %d\n", p.nivel);
     printf("%s\n", p.descricao);
 
     for (int j = 0; j < 4; j++) {
@@ -25,8 +25,9 @@ int perguntar(Pergunta p, int *pulos, int *ajudas) {
     printf("\n--Ajuda--\n");
     printf("[1] Pular Pergunta (%d restantes)\n", *pulos);
     printf("[2] Pedir ajuda da plateia (%d restantes)\n", *ajudas);
-    printf("[3] Pedir ajuda as cartas (%d restantes)\n", *ajudas);
-    printf("[4] Pular ajuda as cartas\n");
+    printf("[3] Pedir ajuda aos universitários (%d restantes)\n", *ajudas);
+    printf("[4] Pedir ajuda as cartas (%d restantes)\n", *ajudas);
+    printf("[5] Parar\n");
 
     printf("\nDigite a alternativa: ");
     scanf(" %c", &resposta);
@@ -44,14 +45,126 @@ int perguntar(Pergunta p, int *pulos, int *ajudas) {
         }
     }
 
-    if (resposta == '2' || resposta == '3') {
+    else if (resposta == '2') {
         if (*ajudas > 0) {
             (*ajudas)--;
+
+            int votos[4] = {0};
+            int indice_correto = p.alt_correta - 'a';
+
+            for (int i = 0; i < 30; i++)
+            {
+                int chance = rand() % 100; 
+
+                if(chance < 40){
+                    votos[indice_correto]++;
+                }
+                else if(chance < 60){
+                    votos[(indice_correto + 1) % 4]++;
+                }
+                else if(chance < 80){
+                    votos[(indice_correto + 2) % 4]++;
+                }else{
+                    votos[(indice_correto + 3) % 4]++;
+                }
+            }
+
+            printf("A plateia diz que:\n");
+            for (int i = 0; i < 4; i++)
+            {
+                printf("alternativa %c) é a correta com %d votos\n", letras[i], votos[i]);
+            }
+
+            
+            
             printf("Ajuda utilizada! Ajudas restantes: %d\n", *ajudas);
         } else {
             printf("Você não tem mais ajudas!\n");
         }
         return 2; 
+    }
+
+    else if(resposta == '3'){
+
+        if(*(ajudas) > 0){
+            
+            *(ajudas)--;
+
+            int votos[4] = {0};
+            int indice_correto = p.alt_correta - 'a';
+
+            for (int i = 0; i < 3; i++)
+            {
+                int chance = rand() % 10;
+
+                if(chance < 7){
+                    votos[indice_correto]++;
+                }
+                else if(chance < 8){
+                    votos[(indice_correto+ 1) % 4]++;
+                }
+                else if(chance < 9){
+                    votos[(indice_correto + 2) % 4]++;
+                }
+                else{
+                    votos[(indice_correto + 3) % 4]++;
+                }
+
+            }
+            
+            printf("\nOs universitarios dizem que:\n\n");
+            for (int i = 0; i < 4; i++)
+            {
+                printf("alternativa %c) é a correta com %d votos\n", letras[i], votos[i]);
+            }
+
+            printf("\nAjuda utilizada! Ajudas restantes: %d\n", *ajudas);
+
+        }else{
+            printf("Você não tem mais ajudas!\n");
+        }
+        return 2; 
+    }
+
+    else if(resposta == '4'){
+        if(*(ajudas) > 0){
+            *(ajudas)--;
+
+            int indice_correto = p.alt_correta - 'a';
+            int eliminadas[4] = {0};
+
+            int eliminadas_count = 0;
+
+            while(eliminadas_count < 2){
+                int indice = rand() % 4;
+
+                if(indice != indice_correto && eliminadas[indice] == 0){
+                    eliminadas[indice] = 1;
+                    eliminadas_count++;
+                }
+            }
+            
+
+            printf("\nAjuda das cartas:\n");
+
+            for (int i = 0; i < 4; i++)
+            {
+                if(eliminadas[i] == 1){
+                    printf("%c) [ELIMINADA]\n", letras[i]);
+                }else{
+                    printf("%c) %s\n", letras[i], p.alt[i]);
+                }
+            }
+            
+        }else{
+            printf("Você não tem mais ajudas!\n");
+        }
+        return 2; 
+    }   
+        
+
+    if(resposta == '5'){
+        return 0;
     }
 
     if (resposta == p.alt_correta) {
@@ -105,19 +218,16 @@ int main() {
         for (int i = 0; i < qtd_perguntas; i++) {
             int ind_pergunta;
 
-            // Escolhe pergunta aleatória que ainda não foi usada
             do {
                 ind_pergunta = inicio + rand() % (fim - inicio + 1);
             } while (repete[ind_pergunta]);
 
             int resultado;
-            do {
+
+            while (1) {
                 resultado = perguntar(perguntas[ind_pergunta], &pulos, &ajudas);
-            } while (resultado == 2); // repetir se foi pulada ou pediu ajuda
 
-            repete[ind_pergunta] = 1; 
-
-            if (resultado == 1) {
+                if (resultado == 1) {
                 // acerto
                 switch (nivel) {
                     case 1: valor_ganho += 1000; break;
@@ -129,10 +239,25 @@ int main() {
                             return 0;
                 }
                 printf("Correto! Total até agora: R$ %d\n", valor_ganho);
-            } else {
-                printf("Resposta errada! Você perdeu.\n");
-                return 1;
+                repete[ind_pergunta] = 1; // pergunta usada
+                break; // vai para próxima pergunta
+                } 
+                else if (resultado == 0) {
+                // Usuário parou ou errou
+                    printf("Você decidiu parar ou errou a pergunta.\n");
+                    return 1;
+                } 
+                else if (resultado == 2) {
+                // Pergunta pulada ou ajuda usada
+                    if (pulos > 0) { // se tiver pulos cai aqui
+                        
+                        repete[ind_pergunta] = 1; // marca como usada
+                        break; // vai para próxima pergunta
+                    }
+                // se só foi ajuda ou nao tem mais pulos, repete a pergunta
+                }
             }
+            
         }
     }
 
