@@ -247,12 +247,16 @@ int main() {
                 }
 
                 printf("Correto! Total ate agora: R$ %d\n", valor_ganho);
+
             } else if (resultado == 4) {
                 printf("\nVoce decidiu parar.\n");
                 printf("Voce leva para casa: R$ %d\n", valor_ganho);
                 return 1;
+
             } else if (resultado == 5) {
+                qtd_perguntas++;
                 continue;
+
             } else {
                 printf("Resposta errada! Voce perdeu.\n");
                 return 1;
