@@ -66,10 +66,7 @@ struct pergunta {
     char alt_correta;
 };
 
-```
-## Como compilar e Executar
-- gcc main.c -o jogo
--./jogo
+
 
 
 
