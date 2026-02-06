@@ -65,3 +65,8 @@ struct pergunta {
     char alt[4][30];
     char alt_correta;
 };
+
+## Como compilar e Executar
+- gcc main.c -o jogo
+-./jogo
+
