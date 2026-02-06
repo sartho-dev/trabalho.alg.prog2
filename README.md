@@ -65,6 +65,20 @@ struct pergunta {
     char alt[4][30];
     char alt_correta;
 };
+```
+
+## ▶️ Como Compilar e Executar
+
+### Pré-requisitos
+- Compilador GCC instalado
+- Sistema operacional Linux, macOS ou Windows (com MinGW)
+
+### Compilação
+Abra o terminal na pasta do projeto e execute:
+
+```bash
+gcc main.c -o jogo
+
 
 
 
